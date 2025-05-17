@@ -115,10 +115,10 @@
         </StackPanel>
 	
         <TextBlock Grid.Row="4" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10">
-            此工具用于Unity打包，可以在Windows, MacOS, Linux上使用
-            <LineBreak/> 应用启动Logo 可以是图片，也可以是视频
+            应用启动Logo 可以是图片，也可以是视频，
+            <LineBreak/> 如果是视频的话，需要事先在Unity中写好加载视频的逻辑
             <LineBreak/> 应用图标因为按照分辨率，会有多个，请直接在引擎中配死
-            <LineBreak/> <HyperlinkButton Content="github地址" FontSize="15" VerticalContentAlignment="Bottom"/>
+            <LineBreak/> <HyperlinkButton Content="github地址" FontSize="15" VerticalContentAlignment="Bottom" NavigateUri="https://github.com/cookgoing/UnityBuildTool/tree/UnityBuildTool"/>
         </TextBlock>
 	
         <ListBox  Grid.Row="5" Name="LogListBox" Margin="10">
