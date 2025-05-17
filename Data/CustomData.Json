@@ -1,0 +1,23 @@
+{
+    "LaunchLogoPath": null,
+    "ScriptExportPath": "D:\\Work\\GenesisRelic\\GenesisRelic_Client\\Assets\\Scripts\\Business\\Editor\\",
+    "GitProjectPath": "D:\\Work\\GenesisRelic\\",
+    "UnityEditorPath": "D:\\Software\\Unity Hub\\UnityEditor\\6000.0.25f1\\Editor\\Unity.exe",
+    "UnityProjectPath": "D:\\Work\\GenesisRelic\\GenesisRelic_Client\\",
+    "ExecuteTypeIdx": 0,
+    "GitUpdate": false,
+    "TeamIdentity": "BambooCopter",
+    "ProductionIdentity": "GenesisRelic",
+    "TeamName": "竹蜻蜓",
+    "ProductionName": "创世神器",
+    "IsDev": true,
+    "MajorVer": 0,
+    "MinorVer": 2,
+    "PatchVer": 0,
+    "BuildNumber": 1,
+    "InitLanguageIdx": 0,
+    "BuildAndroid": true,
+    "BuildWindows": true,
+    "LaunchLogoExportPath": null,
+    "PackageBuildExportPath": "D:\\Work\\GenesisRelic\\BuildResult\\"
+}

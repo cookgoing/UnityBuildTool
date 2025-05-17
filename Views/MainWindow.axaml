@@ -1,0 +1,132 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="900"
+        x:Class="UnityBuildTool.Views.MainWindow"
+        Title="Unity打包工具" Height="1050" Width="800">
+    
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+        <Image Name="TeamLogoImg" Width="96" Height="96" Margin="0, 0, 0, 10" />
+        
+        <TabControl Grid.Row="1">
+            <TabItem Header="基础信息">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10" >
+                        <TextBlock Text="团队标识：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="TeamIdentityText" Watermark="请输入团队标识" VerticalAlignment="Center" FontSize="15" Width="150"/>
+		    
+                        <TextBlock Text="产品标识：" VerticalAlignment="Center" FontSize="15" Margin="30,0,0,0"/>
+                        <TextBox Name="ProductIdentityText" Watermark="请输入产品标识" VerticalAlignment="Center" FontSize="15" Width="150"/>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10" >
+                        <TextBlock Text="团队名字：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="TeamNameText" VerticalAlignment="Center" Width="150" FontSize="15"/>
+		    
+                        <TextBlock Text="产品名字：" VerticalAlignment="Center" FontSize="15" Margin="30,0,0,0"/>
+                        <TextBox Name="ProductNameText" VerticalAlignment="Center" Width="150" FontSize="15"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="模式：" VerticalAlignment="Center" FontSize="15"/>
+                        <ComboBox Name="BuildModeBox" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" SelectionChanged="OnBuildModeChanged">
+                            <ComboBoxItem IsSelected="True" Content="dev"/>
+                            <ComboBoxItem Content="release"/>
+                        </ComboBox>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="版本号：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="MajorVerText" VerticalAlignment="Center" FontSize="15" TextChanged="OnMajorVerTextChanged"/>
+                        <TextBlock Text="." VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="MinorVerText" VerticalAlignment="Center" FontSize="15" TextChanged="OnMinorVerTextChanged"/>
+                        <TextBlock Text="." VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="PatchVerText" VerticalAlignment="Center" FontSize="15" TextChanged="OnPatchVerTextChanged"/>
+		    
+                        <TextBlock Text="构建号：" VerticalAlignment="Center" FontSize="15" Margin="30,0,0,0"/>
+                        <TextBox Name="BuildCodeText" VerticalAlignment="Center" FontSize="15" TextChanged="OnBuildNumberTextChanged"/>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="初始语言：" VerticalAlignment="Center" FontSize="15"/>
+                        <ComboBox Name="InitLanguageBox" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" SelectionChanged="OnInitLanguageChanged">
+                            <ComboBoxItem IsSelected="True" Content="简体中文"/>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="路径">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="应用启动Logo：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="LanuchLogoPathText" VerticalAlignment="Center" Width="400" FontSize="15"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnAppLaunchLogoSelectBtn"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="脚本导出到Unity的路径：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="ScriptExportPathText" VerticalAlignment="Center" FontSize="15" Width="400"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnUnityBuilderExportBtn"/>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="启动Logo导出到Unity的路径：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="LanuchLogoExportPathText" VerticalAlignment="Center" FontSize="15" Width="400"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnAppLaunchLogoExportBtn"/>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="包导出路径：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="PackageExportPathText" VerticalAlignment="Center" FontSize="15" Width="400"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnPackageExportBtn"/>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="git工程路径：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="GitProjectPathText" VerticalAlignment="Center" FontSize="15" Width="400"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnGitProjectBtn"/>
+                    </StackPanel>
+	    
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <TextBlock Text="UnityEditor路径：" VerticalAlignment="Center" FontSize="15"/>
+                        <TextBox Name="UnityEditorPathText" VerticalAlignment="Center" FontSize="15" Width="200"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnUnityEditorBtn"/>
+		    
+                        <TextBlock Text="Unity工程路径：" VerticalAlignment="Center" FontSize="15" Margin="10,0,0,0"/>
+                        <TextBox Name="UnityProjectPathText" VerticalAlignment="Center" FontSize="15" Width="200"/>
+                        <Button Content="..." Margin="5,0,0,0" Click="OnUnityProjectBtn"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="10">
+            <CheckBox Name="GitUpdateCheck" Content="git 拉取到最新" IsChecked="True" FontSize="15" Margin="10" IsCheckedChanged="OnGitUpdateToggleChanged"/>
+            <CheckBox Name="AndroidBuildCheck" Content="打包Android" IsChecked="True" FontSize="15" Margin="10" IsCheckedChanged="OnBuildAndroidToggleChanged"/>
+            <CheckBox Name="WindowBuildCheck" Content="打包Windows" IsChecked="True" FontSize="15" Margin="10" IsCheckedChanged="OnBuildWindowsToggleChanged"/>
+        </StackPanel>
+	
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="10">
+            <ComboBox Name="ExecuteBox" Width="100" Margin="5,0" SelectionChanged="OnExecuteTypeChanged">
+                <ComboBoxItem IsSelected="True" Content="打包"/>
+            </ComboBox>
+            <Button Content="执行" Width="100" HorizontalContentAlignment="Center" Margin="5,0" Click="OnExecuteBtn"/>
+        </StackPanel>
+	
+        <TextBlock Grid.Row="4" FontSize="15" TextWrapping="Wrap" VerticalAlignment="Center" Margin="10">
+            此工具用于Unity打包，可以在Windows, MacOS, Linux上使用
+            <LineBreak/> 应用启动Logo 可以是图片，也可以是视频
+            <LineBreak/> 应用图标因为按照分辨率，会有多个，请直接在引擎中配死
+            <LineBreak/> <HyperlinkButton Content="github地址" FontSize="15" VerticalContentAlignment="Bottom"/>
+        </TextBlock>
+	
+        <ListBox  Grid.Row="5" Name="LogListBox" Margin="10">
+            <ListBoxItem>Log 1</ListBoxItem>
+            <ListBoxItem>Log 2</ListBoxItem>
+            <ListBoxItem>Log 3</ListBoxItem>
+            <ListBoxItem>Log 4</ListBoxItem>
+            <ListBoxItem>Log 5</ListBoxItem>
+        </ListBox>
+    </Grid>
+</Window>
