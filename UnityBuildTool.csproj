@@ -55,6 +55,7 @@
     <ItemGroup>
       <Folder Include="Data\" />
       <Folder Include="Log\" />
+      <Folder Include="Utils\" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,11 @@
 {
+  "ChannelNames": [
+    "Steam",
+    "GooglePlay",
+    "TapTap",
+    "WeChat",
+    "HYKB"
+  ],
   "TeamIdentity": "BambooCopter",
   "ProductionIdentity": "GenesisRelic",
   "TeamName": null,

@@ -22,6 +22,16 @@ namespace Business.Editor
 
 			string jsonCfg = Encoding.UTF8.GetString(Convert.FromBase64String(jsonBase64));
 			BuildInfo buildInfo = JsonConvert.DeserializeObject<BuildInfo>(jsonCfg);
+			ChannelEN channel = ChannelEN.TapTap;
+			switch (buildInfo.Channel)
+			{
+				case "Steam": channel = ChannelEN.Steam; break;
+				case "GooglePlay": channel = ChannelEN.GooglePlay; break;
+				case "TapTap": channel = ChannelEN.TapTap; break;
+				case "WeChat": channel = ChannelEN.WeChat; break;
+				case "HYKB": channel = ChannelEN.HYKB; break;
+				default: throw new Exception($"unknow channel: {buildInfo.Channel}");
+			}
 
 			string gameInfoFilePath = Path.GetFullPath(GameConfigure.GameInfoPath);
 			GameInfo gameInfo = JsonConvert.DeserializeObject<GameInfo>(File.ReadAllText(gameInfoFilePath));
@@ -29,6 +39,7 @@ namespace Business.Editor
 			gameInfo.MinorVer = buildInfo.MinorVer;
 			gameInfo.PatchVer = buildInfo.PatchVer;
 			gameInfo.BuildNumber = buildInfo.BuildNumber;
+			gameInfo.Channel = channel;
 			File.WriteAllText(gameInfoFilePath, JsonConvert.SerializeObject(gameInfo));
 
 			PlayerSettings.applicationIdentifier = $"com.{buildInfo.TeamIdentity}.{buildInfo.ProductionIdentity}";
@@ -39,22 +50,33 @@ namespace Business.Editor
 			buildPlayerOptions.scenes = new[] { "Assets/Scenes/Launch.unity" };
 			buildPlayerOptions.options = buildInfo.IsDev ? BuildOptions.Development : BuildOptions.None;
 
-			bool hasLogo = !string.IsNullOrEmpty(buildInfo.LaunchLogoExportPath);
+			bool hasLogo = !string.IsNullOrEmpty(buildInfo.LaunchLogoPath);
 			PlayerSettings.SplashScreenLogo[] logs = null;
 			if (hasLogo)
 			{
-				string extension = Path.GetExtension(buildInfo.LaunchLogoExportPath);
+				string extension = Path.GetExtension(buildInfo.LaunchLogoPath);
 				bool isTexture = extension == ".png" || extension == ".jpg";
-				string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-				string unityPath = buildInfo.LaunchLogoExportPath.Replace(baseDir, string.Empty);
-				logs = new[]
+				if (isTexture)
 				{
-					new PlayerSettings.SplashScreenLogo
+					var textDatas = File.ReadAllBytes(buildInfo.LaunchLogoPath);
+					Texture2D texture = new(-1, -1);
+					texture.LoadImage(textDatas);
+					Sprite sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f), 100.0f);
+					logs = new[]
 					{
-						logo = AssetDatabase.LoadAssetAtPath<Sprite>(unityPath),
-						duration = 2.0f
-					},
-				};
+						new PlayerSettings.SplashScreenLogo
+						{
+							logo = sprite,
+							duration = 2.0f
+						},
+					};
+				}
+				else
+				{
+					// todo: ...
+					// string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+					// string unityPath = buildInfo.LaunchLogoExportPath.Replace(baseDir, string.Empty);
+				}
 			}
 			PlayerSettings.SplashScreen.showUnityLogo = false;
 			PlayerSettings.SplashScreen.logos = logs;
@@ -63,7 +85,6 @@ namespace Business.Editor
 			
 			string buildMode = buildInfo.IsDev ? "dev" : "release";
 			string versionStr = $"{buildInfo.MajorVer}.{buildInfo.MinorVer}.{buildInfo.PatchVer}";
-			string language = "cn";
 			string versionDir = Path.Combine(buildInfo.PackageBuildExportPath, versionStr, buildMode);
 			if (!Directory.Exists(versionDir)) Directory.CreateDirectory(versionDir);
 			else FileUtils.ClearDirectory(versionDir, true);
@@ -75,7 +96,7 @@ namespace Business.Editor
 				PlayerSettings.Android.bundleVersionCode = (int)buildInfo.BuildNumber;
 				PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
 				
-				string apkName = $"{buildInfo.ProductionIdentity}_{buildMode}_{versionStr}_{language}.apk";
+				string apkName = $"{buildInfo.ProductionIdentity}_{buildMode}_{versionStr}_{channel}.apk";
 				string exportFilePath = Path.Combine(versionDir, apkName);
 				buildPlayerOptions.target = BuildTarget.Android;
 				buildPlayerOptions.locationPathName = exportFilePath;
@@ -90,7 +111,7 @@ namespace Business.Editor
 				PlayerSettings.macOS.buildNumber = buildInfo.BuildNumber.ToString();
 				PlayerSettings.SetScriptingBackend(NamedBuildTarget.Standalone, ScriptingImplementation.IL2CPP);
 
-				string dirName = $"{buildInfo.ProductionIdentity}_{buildMode}_{versionStr}_{language}_win";
+				string dirName = $"{buildInfo.ProductionIdentity}_{buildMode}_{versionStr}_{channel}_win";
 				string exeName = $"{buildInfo.ProductionIdentity}.exe";
 				string exportDir = Path.Combine(versionDir, dirName);
 				string exportFilePath = Path.Combine(exportDir, exeName);

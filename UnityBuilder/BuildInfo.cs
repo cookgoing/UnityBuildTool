@@ -1,11 +1,6 @@
-﻿
-public enum InitLanguageEn
+﻿public struct BuildInfo
 {
-    SimpleChinese,
-}
-
-public struct BuildInfo
-{
+    public string[] ChannelNames;
     public string LaunchLogoPath;
     public string ScriptExportPath;
     public string GitProjectPath;
@@ -23,7 +18,7 @@ public struct BuildInfo
     public uint MinorVer;
     public uint PatchVer;
     public uint BuildNumber;
-    public int InitLanguageIdx;
+    public string Channel;
     public bool BuildAndroid;
     public bool BuildWindows;
     public string LaunchLogoExportPath;

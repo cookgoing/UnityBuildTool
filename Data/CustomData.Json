@@ -1,4 +1,11 @@
 {
+    "ChannelNames": [
+        "Steam",
+        "GooglePlay",
+        "TapTap",
+        "WeChat",
+        "HYKB"
+    ],
     "LaunchLogoPath": null,
     "ScriptExportPath": "D:\\Work\\GenesisRelic\\GenesisRelic_Client\\Assets\\Scripts\\Business\\Editor\\",
     "GitProjectPath": "D:\\Work\\GenesisRelic\\",

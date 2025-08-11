@@ -10,7 +10,9 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Newtonsoft.Json;
+using Tmds.DBus.Protocol;
 using UnityBuildTool.Configure;
+using UnityBuildTool.Utils;
 
 namespace UnityBuildTool.Views;
 
@@ -21,11 +23,12 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        LogMessageHandler.Init(this);
 
         customInfo = ReadJsonCfg(GeneralCfg.CustomDataPath);
         LogListBox.Items.Clear();
 
-        RefreshImg();
+        RefreshLogo();
         RefreshComboBox();
         RefreshTextBox();
         RefreshCheckBox();
@@ -97,25 +100,42 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RefreshImg()
+    private void RefreshLogo()
     {
         var iconPath = Path.Combine(AppContext.BaseDirectory, "images", "teamLogo.png");
         var bitmap = new Bitmap(iconPath);
+        double maxSize = 250;
+        double width, height;
+        if (bitmap.Size.Width > bitmap.Size.Height)
+        {
+            width = maxSize;
+            height = width / bitmap.Size.AspectRatio;
+        }
+        else
+        {
+            height = maxSize;
+            width = height * bitmap.Size.AspectRatio;
+        }
+
         TeamLogoImg.Source = bitmap;
+        TeamLogoImg.Width = width;
+        TeamLogoImg.Height = height;
     }
 
     private void RefreshComboBox()
     {
         BuildModeBox.Items.Clear();
-        InitLanguageBox.Items.Clear();
+        Channel.Items.Clear();
         ExecuteBox.Items.Clear();
 
         foreach (var kv in CheckBoxEnums.BuildModeDic) BuildModeBox.Items.Add(new ComboBoxItem { Content = kv.Value });
-        foreach (var kv in CheckBoxEnums.LanguageDic) InitLanguageBox.Items.Add(new ComboBoxItem { Content = kv.Value });
+        foreach (var channelName in customInfo.ChannelNames) Channel.Items.Add(new ComboBoxItem { Content = channelName });
         foreach (var kv in CheckBoxEnums.ExecuteTypeDic) ExecuteBox.Items.Add(new ComboBoxItem { Content = kv.Value });
+
+        int channelIdx = Array.IndexOf(customInfo.ChannelNames, customInfo.Channel);
         
         BuildModeBox.SelectedIndex = (int)(customInfo.IsDev ? CheckBoxEnums.BuildModeEn.Dev : CheckBoxEnums.BuildModeEn.Release);
-        InitLanguageBox.SelectedIndex = customInfo.InitLanguageIdx;
+        Channel.SelectedIndex = channelIdx;
         ExecuteBox.SelectedIndex = customInfo.ExecuteTypeIdx;
     }
     private void RefreshTextBox()
@@ -143,7 +163,7 @@ public partial class MainWindow : Window
         WindowBuildCheck.IsChecked = customInfo.BuildWindows;
     }
 
-    private int AddLogItem(string logStr, CheckBoxEnums.LogType logType)
+    public int AddLogItem(string logStr, CheckBoxEnums.LogType logType)
     {
         return LogListBox.Items.Add(new ListBoxItem
         {
@@ -151,9 +171,9 @@ public partial class MainWindow : Window
             Foreground = logType == CheckBoxEnums.LogType.Error ? Brushes.Red : logType == CheckBoxEnums.LogType.Warn ? Brushes.Orange : Brushes.Black,
         });
     }
-    private void MoveLogListScroll(int idx = -1)
+    public void MoveLogListScroll(int idx = -1)
     {
-        if (idx == -1)
+        if (idx == -1 && LogListBox.Items.Count > 0)
         {
             MoveLogListScroll(LogListBox.Items.Count - 1);
             return;
@@ -175,7 +195,7 @@ public partial class MainWindow : Window
 
         if (!uint.TryParse((string?)MajorVerText.Text, out uint majorVer))
         {
-            AddLogItem($"版本号解析失败，只能是整形字符串", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError("版本号解析失败，只能是整形字符串");
             MajorVerText.Text = customInfo.MajorVer.ToString();
             return;
         }
@@ -193,7 +213,7 @@ public partial class MainWindow : Window
         
         if (!uint.TryParse((string?)MinorVerText.Text, out uint minorVer))
         {
-            AddLogItem($"版本号解析失败，只能是整形字符串", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError("版本号解析失败，只能是整形字符串");
             MinorVerText.Text = customInfo.MinorVer.ToString();
             return;
         }
@@ -211,7 +231,7 @@ public partial class MainWindow : Window
         
         if (!uint.TryParse((string?)PatchVerText.Text, out uint patchVer))
         {
-            AddLogItem($"版本号解析失败，只能是整形字符串", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError("版本号解析失败，只能是整形字符串");
             PatchVerText.Text = customInfo.PatchVer.ToString();
             return;
         }
@@ -229,7 +249,7 @@ public partial class MainWindow : Window
         
         if (!uint.TryParse((string?)BuildCodeText.Text, out uint buldNumber) || buldNumber == 0)
         {
-            AddLogItem($"构建号解析失败，只能是 >0 整形字符串", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError("构建号解析失败，只能是 >0 整形字符串");
             BuildCodeText.Text = customInfo.BuildNumber.ToString();
             return;
         }
@@ -238,7 +258,7 @@ public partial class MainWindow : Window
     }
     
     private void OnBuildModeChanged(object? sender, SelectionChangedEventArgs e) => customInfo.IsDev = (CheckBoxEnums.BuildModeEn)BuildModeBox.SelectedIndex == CheckBoxEnums.BuildModeEn.Dev;
-    private void OnInitLanguageChanged(object? sender, SelectionChangedEventArgs e) => customInfo.InitLanguageIdx = InitLanguageBox.SelectedIndex;
+    private void OnChannelChanged(object? sender, SelectionChangedEventArgs e) => customInfo.Channel = customInfo.ChannelNames[Channel.SelectedIndex];
     private void OnExecuteTypeChanged(object? sender, SelectionChangedEventArgs e) => customInfo.ExecuteTypeIdx = ExecuteBox.SelectedIndex;
     
     private void OnGitUpdateToggleChanged(object? sender, RoutedEventArgs e) => customInfo.GitUpdate = GitUpdateCheck.IsChecked??false;
@@ -281,6 +301,7 @@ public partial class MainWindow : Window
     {
         try
         {
+            bool result = true;
             customInfo.TeamIdentity = TeamIdentityText.Text;
             customInfo.ProductionIdentity = ProductIdentityText.Text;
             customInfo.TeamName = TeamNameText.Text;
@@ -288,15 +309,15 @@ public partial class MainWindow : Window
 
             WriteJsonCfg(customInfo, GeneralCfg.CustomDataPath);
 
-            if (!await GitUpdate()) return false;
-            if (!FilesCopy()) return false;
-            if (!await UnityBuild()) return false;
-
-            return true;
+            result = await GitUpdate();
+            result &= FilesCopy();
+            result &= await UnityBuild();
+            return result;
         }
         catch (Exception ex)
         {
-            AddLogItem($"[BuildPackage]. errorMsg: {ex.Message}", CheckBoxEnums.LogType.Error);
+            // LogMessageHandler.AddError($"[BuildPackage]. errorMsg: {ex.Message}");
+            LogMessageHandler.LogException(ex);
             return false;
         }
     }
@@ -305,10 +326,10 @@ public partial class MainWindow : Window
         string gitProjectPath = NormlizePath(ParsePath(customInfo.GitProjectPath));
         if (string.IsNullOrEmpty(gitProjectPath) || !customInfo.GitUpdate) return true;
 
-        AddLogItem("[git 更新]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[git 更新]");
         if (!Directory.Exists(gitProjectPath) || !File.Exists(Path.Combine(gitProjectPath, ".git", "config")))
         {
-            AddLogItem($"路径不是有效的 Git 仓库: {gitProjectPath}", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError($"路径不是有效的 Git 仓库: {gitProjectPath}");
             return false;
         }
 
@@ -329,10 +350,10 @@ public partial class MainWindow : Window
         string error = await process.StandardError.ReadToEndAsync();
         await process.WaitForExitAsync();
 
-        if (process.ExitCode == 0) AddLogItem($"Git pull 成功：{output}", CheckBoxEnums.LogType.Info);
-        else AddLogItem($"Git pull 失败：{error}", CheckBoxEnums.LogType.Error);
+        if (process.ExitCode == 0) LogMessageHandler.AddInfo($"Git pull 成功：{output}");
+        else LogMessageHandler.AddError($"Git pull 失败：{error}");
         
-        AddLogItem("[git 更新完成]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[git 更新完成]");
         return true;
     }
     private bool FilesCopy()
@@ -341,7 +362,7 @@ public partial class MainWindow : Window
         string launchLogoExportPath = NormlizePath(ParsePath(customInfo.LaunchLogoExportPath));
         if (!string.IsNullOrEmpty(launchLogoPath) && !string.IsNullOrEmpty(launchLogoExportPath))
         {
-            AddLogItem("[copy 启动Logo]", CheckBoxEnums.LogType.Info);
+            LogMessageHandler.AddInfo("[copy 启动Logo]");
             if (!Directory.Exists(launchLogoExportPath)) Directory.CreateDirectory(launchLogoExportPath);
 
             string fileName = Path.GetFileName(launchLogoPath);
@@ -353,11 +374,11 @@ public partial class MainWindow : Window
         string scriptExportPath = NormlizePath(ParsePath(customInfo.ScriptExportPath));
         if (string.IsNullOrEmpty(scriptExportPath))
         {
-            AddLogItem("构建脚本 没有导出路径，无法导出", CheckBoxEnums.LogType.Error);            
+            LogMessageHandler.AddError("构建脚本 没有导出路径，无法导出");
             return false;
         }
 
-        AddLogItem("[copy 构建脚本]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[copy 构建脚本]");
         if (!Directory.Exists(scriptExportPath)) Directory.CreateDirectory(scriptExportPath);
 
         string buildInfoFileName = Path.GetFileName(GeneralCfg.BuildInfoPath);
@@ -368,7 +389,7 @@ public partial class MainWindow : Window
         File.Copy(GeneralCfg.BuildInfoPath, buildInfoExportPath, true);
         File.Copy(GeneralCfg.BuildScriptPath, buildScriptExportPath, true);
 
-        AddLogItem("[文件copy完成]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[文件copy完成]");
         return true;
     }
     private async Task<bool> UnityBuild()
@@ -376,23 +397,22 @@ public partial class MainWindow : Window
         string unityEditorPath = NormlizePath(ParsePath(customInfo.UnityEditorPath));
         if (string.IsNullOrEmpty(unityEditorPath))
         {
-            AddLogItem("没有Unity Editor执行文件，无法启动", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError("没有Unity Editor执行文件，无法启动");
             return false;
         }
 
         string unityProjectPath = NormlizePath(ParsePath(customInfo.UnityProjectPath));
         if (string.IsNullOrEmpty(unityProjectPath) || !Directory.Exists(unityProjectPath))
         {
-            AddLogItem("没有Unity 工程路径，无法启动", CheckBoxEnums.LogType.Error);
+            LogMessageHandler.AddError("没有Unity 工程路径，无法启动");
             return false;
         }
         
-        AddLogItem($"[尝试关闭所有Unity的编辑器]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[尝试关闭所有Unity的编辑器]");
         await CloseProcess("Unity");
-        // await CloseProcess("GenesisRelic");
-        AddLogItem($"[已关闭所有Unity的编辑器]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[已关闭所有Unity的编辑器]");
         
-        AddLogItem($"[开始构建]", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo("[开始构建]");
         string unityPath = unityEditorPath;
         string projectPath = unityProjectPath.TrimEnd('\\');
         string jsonCfg = JsonConvert.SerializeObject(customInfo);
@@ -420,10 +440,10 @@ public partial class MainWindow : Window
         using var fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var reader = new StreamReader(fs);
         string logContent = await reader.ReadToEndAsync();
-        AddLogItem($"[构建结束].\nlog: {logContent}", CheckBoxEnums.LogType.Info);
+        LogMessageHandler.AddInfo($"[构建结束].\nlog: {logContent}");
         
-        if (process.ExitCode == 0) AddLogItem($"构建成功：{output}", CheckBoxEnums.LogType.Info);
-        else AddLogItem($"构建失败：exitCode: {process.ExitCode}; errorContent: {error}\noutput: {output}", CheckBoxEnums.LogType.Error);
+        if (process.ExitCode == 0) LogMessageHandler.AddInfo($"构建成功：{output}");
+        else LogMessageHandler.AddError($"构建失败：exitCode: {process.ExitCode}; errorContent: {error}\noutput: {output}");
 
         return true;
     }

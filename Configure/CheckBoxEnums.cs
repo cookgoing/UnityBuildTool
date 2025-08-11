@@ -29,11 +29,6 @@ public static class CheckBoxEnums
         {BuildModeEn.Release, "Release"},
     };
     
-    public static readonly Dictionary<InitLanguageEn, string> LanguageDic = new()
-    {
-        {InitLanguageEn.SimpleChinese, "简体中文"},
-    };
-
     public static readonly Dictionary<ExecuteTypeEn, string> ExecuteTypeDic = new()
     {
         {ExecuteTypeEn.Build, "打包"},
