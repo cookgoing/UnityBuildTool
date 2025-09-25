@@ -11,8 +11,7 @@
     
     public string TeamIdentity;
     public string ProductionIdentity;
-    public string TeamName;
-    public string ProductionName;
+    public string ApplicationName;
     public bool IsDev;
     public uint MajorVer;
     public uint MinorVer;

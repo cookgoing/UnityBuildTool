@@ -18,16 +18,11 @@
 		    
                         <TextBlock Text="产品标识：" VerticalAlignment="Center" FontSize="15" Margin="30,0,0,0"/>
                         <TextBox Name="ProductIdentityText" Watermark="请输入产品标识" VerticalAlignment="Center" FontSize="15" Width="150"/>
+                        
+                        <TextBlock Text="应用名字：" VerticalAlignment="Center" FontSize="15" Margin="30,0,0,0"/>
+                        <TextBox Name="ProductNameText" Watermark="请输入应用名字" VerticalAlignment="Center" Width="150" FontSize="15"/>
                     </StackPanel>
-	    
-                    <StackPanel Orientation="Horizontal" Margin="10" >
-                        <TextBlock Text="团队名字：" VerticalAlignment="Center" FontSize="15"/>
-                        <TextBox Name="TeamNameText" VerticalAlignment="Center" Width="150" FontSize="15"/>
-		    
-                        <TextBlock Text="产品名字：" VerticalAlignment="Center" FontSize="15" Margin="30,0,0,0"/>
-                        <TextBox Name="ProductNameText" VerticalAlignment="Center" Width="150" FontSize="15"/>
-                    </StackPanel>
-                    
+
                     <StackPanel Orientation="Horizontal" Margin="10">
                         <TextBlock Text="模式：" VerticalAlignment="Center" FontSize="15"/>
                         <ComboBox Name="BuildModeBox" VerticalAlignment="Center" HorizontalAlignment="Left" Width="100" SelectionChanged="OnBuildModeChanged">

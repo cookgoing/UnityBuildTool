@@ -142,8 +142,7 @@ public partial class MainWindow : Window
     {
         TeamIdentityText.Text = customInfo.TeamIdentity;
         ProductIdentityText.Text = customInfo.ProductionIdentity;
-        TeamNameText.Text = customInfo.TeamName;
-        ProductNameText.Text = customInfo.ProductionName;
+        ProductNameText.Text = customInfo.ApplicationName;
         LanuchLogoPathText.Text = NormlizePath(ParsePath(customInfo.LaunchLogoPath));
         MajorVerText.Text = customInfo.MajorVer.ToString();
         MinorVerText.Text = customInfo.MinorVer.ToString();
@@ -304,8 +303,7 @@ public partial class MainWindow : Window
             bool result = true;
             customInfo.TeamIdentity = TeamIdentityText.Text;
             customInfo.ProductionIdentity = ProductIdentityText.Text;
-            customInfo.TeamName = TeamNameText.Text;
-            customInfo.ProductionName = ProductNameText.Text;
+            customInfo.ApplicationName = ProductNameText.Text;
 
             WriteJsonCfg(customInfo, GeneralCfg.CustomDataPath);
 
