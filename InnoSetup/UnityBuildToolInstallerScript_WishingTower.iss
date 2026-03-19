@@ -2,22 +2,18 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "UnityBuildTool"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "Jerry.Ding"
-#define MyAppURL "https://www.example.com/"
 #define MyAppExeName "UnityBuildTool.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{BCC4D91C-08CD-44E0-83D5-5EA36588DA9A}
+AppId={{E995DA3B-FB74-4E59-B2F5-1A6325D21005}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
@@ -33,7 +29,7 @@ DisableProgramGroupPage=yes
 ; Remove the following line to run in administrative install mode (install for all users).
 PrivilegesRequired=lowest
 OutputDir=D:\Project\AvaloniaUI\UnityBuildTool\InnoSetup
-OutputBaseFilename=UnityBuildToolSetUp
+OutputBaseFilename=UnityBuildToolInstaller_WishingTower
 SolidCompression=yes
 WizardStyle=modern
 
